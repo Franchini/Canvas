@@ -69,7 +69,7 @@ class ImportWindow(QtGui.QDialog, ImDlg):
                 if line.find(self.separationChar) == -1:
                     pass
                 else:
-                    line.strip()
+                    line = line.strip()
                     # if separation char is not "," it can be replaced by "."
                     if self.separationChar != ",":
                         line = line.replace(",", ".")

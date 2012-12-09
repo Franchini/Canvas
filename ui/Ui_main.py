@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'D:\Dokumente\Studium\Projects\KSS Projekt\Canvas\ui\main.ui'
 #
-# Created: Thu Dec 06 14:40:00 2012
+# Created: Sun Dec 09 15:41:53 2012
 #      by: PyQt4 UI code generator 4.9.4
 #
 # WARNING! All changes made in this file will be lost!
@@ -55,7 +55,7 @@ class Ui_MainWindow(object):
         self.dockWidgetContents = QtGui.QWidget()
         self.dockWidgetContents.setObjectName(_fromUtf8("dockWidgetContents"))
         self.layoutWidget = QtGui.QWidget(self.dockWidgetContents)
-        self.layoutWidget.setGeometry(QtCore.QRect(10, 10, 171, 171))
+        self.layoutWidget.setGeometry(QtCore.QRect(10, 10, 171, 231))
         self.layoutWidget.setObjectName(_fromUtf8("layoutWidget"))
         self.verticalLayout = QtGui.QVBoxLayout(self.layoutWidget)
         self.verticalLayout.setMargin(0)
@@ -77,6 +77,9 @@ class Ui_MainWindow(object):
         self.buttonMysql = QtGui.QPushButton(self.layoutWidget)
         self.buttonMysql.setObjectName(_fromUtf8("buttonMysql"))
         self.verticalLayout.addWidget(self.buttonMysql)
+        self.buttonExport = QtGui.QPushButton(self.layoutWidget)
+        self.buttonExport.setObjectName(_fromUtf8("buttonExport"))
+        self.verticalLayout.addWidget(self.buttonExport)
         self.buttonTable = QtGui.QPushButton(self.layoutWidget)
         self.buttonTable.setObjectName(_fromUtf8("buttonTable"))
         self.verticalLayout.addWidget(self.buttonTable)
@@ -139,6 +142,7 @@ class Ui_MainWindow(object):
         self.buttonImport.setText(QtGui.QApplication.translate("MainWindow", "Import", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonProperties.setText(QtGui.QApplication.translate("MainWindow", "Properties", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonMysql.setText(QtGui.QApplication.translate("MainWindow", "Import from Database", None, QtGui.QApplication.UnicodeUTF8))
+        self.buttonExport.setText(QtGui.QApplication.translate("MainWindow", "Export to Database", None, QtGui.QApplication.UnicodeUTF8))
         self.buttonTable.setText(QtGui.QApplication.translate("MainWindow", "View Table", None, QtGui.QApplication.UnicodeUTF8))
         self.actionExit.setText(QtGui.QApplication.translate("MainWindow", "Exit", None, QtGui.QApplication.UnicodeUTF8))
         self.actionDatabase_datatable.setText(QtGui.QApplication.translate("MainWindow", "database datatable", None, QtGui.QApplication.UnicodeUTF8))

@@ -51,6 +51,7 @@ class MainWindow (QtGui.QMainWindow, Dlg):
         self.connect(self.buttonImport, QtCore.SIGNAL("clicked()"), self.onImport)
         self.connect(self.buttonProperties, QtCore.SIGNAL("clicked()"), self.onProperties)
         self.connect(self.buttonTable, QtCore.SIGNAL("clicked()"), self.onTableShow)
+        self.connect(self.buttonExport, QtCore.SIGNAL("clicked()"), self.onExport)
         
         # last command of __init__ method:
         self.logfile.writeLog("Application initialized")
@@ -58,17 +59,20 @@ class MainWindow (QtGui.QMainWindow, Dlg):
     def closeEvent(self, event):
         # reimplementation of closeEvent to close all open filestreams properly
         # The MessageBox is commented during development
-#        reply = QtGui.QMessageBox.question(self,"Message","Are you sure you want to quit?",
-#            QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
-#        if reply == QtGui.QMessageBox.No:
-#            
-#            event.ignore()
-#        else:
+        reply = QtGui.QMessageBox.question(self,"Message","Do you want to save the current Dataset?",
+            QtGui.QMessageBox.No, QtGui.QMessageBox.Yes, QtGui.QMessageBox.Cancel)
+        if reply == QtGui.QMessageBox.Cancel:
+            
+            event.ignore()
+        else:
+            if reply == QtGui.QMessageBox.Yes:
+                self.__defaultdb.write("data", self.Data)     
             # close all filestreams and then accept closeEvent
             err = self.errorlog.checkNoError()
             self.logfile.writeLog("\nEnding this Session;\n" +
                 "Errors during this Session: "+ str(err) + "\nApplication closed")            
             self.logfile.closeLogFile()
+            # check if the data should be saved
             event.accept()
         
     def onShow(self):
@@ -114,6 +118,24 @@ class MainWindow (QtGui.QMainWindow, Dlg):
     def onProperties(self):
         # show the Properties Window by only using its show() method, since it's initialized yet
         self.properties.show()
+        
+    def onExport(self):
+        # The actual DataObject is exported to the given MySQL connection
+        # first ask if everything should be overrided
+        reply = QtGui.QMessageBox.question(self, "Override Data", "Do you really want to override database %s"%self.properties.getValue('mysqlbase'), 
+            QtGui.QMessageBox.No, QtGui.QMessageBox.Yes)
+        if reply == QtGui.QMessageBox.Yes:
+            try:
+                self.Connection.write(self.properties.getValue('mysqltable'), self.Data)
+            except AttributeError:
+                # there is no Connection, so connect to MySQL database, but do not recieve data
+                self.Connection = MyConnection(self, "mysql", self.properties.getValue('mysqlserver'), self.properties.getValue('mysqluser'),  
+                    self.properties.getValue('mysqlpw'), self.properties.getValue('mysqlbase'), self.properties.getValue('mysqltable'))
+                try:
+                    self.Connection.write(self.properties.getValue('mysqltable'), self.Data)
+                except AttributeError:
+                    # The connection Data maybe wrong
+                    pass
  
 class MyCanvas (FigureCanvas):
     def __init__(self, parent='None', width=5, height=4, dpi=100):
@@ -173,8 +195,55 @@ class MyConnection(object):
      
     def write(self, table, DataObject):
         # will use the db connectors (MySQLdb, sqlite3) to write new values into existing tables
-        pass
+        # connection has to be established again, because it was closed after reading it.
         
+        try:
+            if self.type == "mysql":
+                self.__conn = MySQLdb.connect(self.server, self.user, self.pw, self.database)
+            elif self.type == "sqlite":
+                self.__conn = sqlite3.connect(self.database)
+            self.__reader = self.__conn.cursor()
+            # create content
+            values = self.__queryData(self.__reader, table, DataObject)
+            self.__conn.commit()
+            self.__queryInfo(self.__reader, table+"info", DataObject)
+            self.__conn.commit()
+            self.__conn.close()
+            self.parent.logfile.writeLog("%s Datapoints have been saed to %s" %(values, self.database))
+            return 1
+        except MySQLdb.Error, e:
+            self.parent.errorlog.writeError("MySQL Error occured:\n%s" %e.message)
+        except sqlite3.Error, e:
+            self.parent.errorlog.writeError("SQLite Error occured: \n%s" % e.message)
+        
+    def __queryData(self,  cursor, table, DataObject):
+        # will use the db connection cursor to write all Data in DataObject to given database
+        # the number of written datasets is returned
+        data = DataObject.getAllData()
+        # delete whole table
+        cursor.execute("DELETE FROM %s" % table)
+        for i, point in enumerate(data):
+            command = ("INSERT INTO %s VALUES(%s" % (table, str(i)))
+            for value in point:
+                command += (",%s" % str(value))
+            command += ")"
+            cursor.execute(command)
+            value = i
+        return value
+        
+    def __queryInfo(self, cursor, table, DataObject):
+        # will use the db conncetion cursor to write all info metadata of Dataobject to table
+        
+        #delete whole table
+        cursor.execute("DELETE FROM %s" % table)
+        list = DataObject.getMeta()
+        
+        for i, key in enumerate(list):
+            command = ("INSERT INTO %s ('id','information','value') VALUES('%s'" % (table,  str(i)))
+            command += (",'%s','%s'" % (str(key), str(list[key])))
+            command += ")"
+            cursor.execute(command)
+     
     def __info(self, table):
         # The Info table is read
         info = self.setTable(table)

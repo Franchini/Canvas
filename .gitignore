@@ -172,6 +172,6 @@ pip-log.txt
 
 #########
 # project specific
-errorlog
-log
+errorlog/*.txt
+log/*.txt
 distribution

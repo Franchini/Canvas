@@ -111,7 +111,7 @@
        <x>10</x>
        <y>10</y>
        <width>171</width>
-       <height>171</height>
+       <height>231</height>
       </rect>
      </property>
      <layout class="QVBoxLayout" name="verticalLayout">
@@ -146,6 +146,13 @@
        <widget class="QPushButton" name="buttonMysql">
         <property name="text">
          <string>Import from Database</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="buttonExport">
+        <property name="text">
+         <string>Export to Database</string>
         </property>
        </widget>
       </item>

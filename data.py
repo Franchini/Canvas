@@ -14,6 +14,13 @@ class Data(object):
         self.__timestep = timestep
         self.__name = stationName
         
+#development
+        print self.__datatable
+        print self.__measuringDepths
+        print self.__timestep 
+        print self.getMeta()
+        
+        
     def getMeasuringPoints(self):
         #retuns the number of measuring points
         points = len(self.__datatable)
@@ -34,13 +41,13 @@ class Data(object):
     def getLengthTimestep(self,unit="s"):
         #returns the value of self.__timestep using given unit. Accepted values are s (Second), min (Minute), h (Hour), d (day)
         if unit == "s":
-            value = self.__lengthTimestep
+            value = self.__timestep
         elif unit == "min":
-            value = self.__lengthTimestep / 60
+            value = self.__timestep / 60
         elif unit == "h":
-            value = self.__lengthTimestep / (60*60)
+            value = self.__timestep / (60*60)
         elif unit == "d":
-            value = self.__lengthTimestep / (60*60*24)
+            value = self.__timestep / (60*60*24)
         else: 
             value = 0
         return value
@@ -69,8 +76,19 @@ class Data(object):
                 data[i] = dataAtStep[depthIndex]  #writes value of a certain depth during this timestep
         return data
         
+    def getMeta(self):
+        # returns a dictionary of all Metadata, where key is the name of its value; eg: name : default station
+        name = self.getNameStation()
+        timestep = self.getLengthTimestep("s")
+        depths = self.getDepthsValues()
+        
+        #merge depths to one string
+        temp = ""
+        for depth in depths:
+            temp += str(depth + ",")
+        temp = temp.strip(",")
+        list = {'name':str(name), 'timestep':str(timestep), 'depths':temp}
+        
+        return list
 
-#development
-#        print self.__datatable
-#        print self.__measuringDepths
-#        print self.__timestep
+
