@@ -6,9 +6,27 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>612</width>
-    <height>437</height>
+    <width>641</width>
+    <height>416</height>
    </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>641</width>
+    <height>416</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>641</width>
+    <height>416</height>
+   </size>
   </property>
   <property name="windowTitle">
    <string>Dialog</string>
@@ -18,9 +36,15 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>611</width>
-     <height>431</height>
+     <width>641</width>
+     <height>381</height>
     </rect>
+   </property>
+   <property name="selectionMode">
+    <enum>QAbstractItemView::ExtendedSelection</enum>
+   </property>
+   <property name="selectionBehavior">
+    <enum>QAbstractItemView::SelectItems</enum>
    </property>
    <property name="sortingEnabled">
     <bool>true</bool>
@@ -31,6 +55,9 @@
    <property name="columnCount">
     <number>9</number>
    </property>
+   <attribute name="horizontalHeaderCascadingSectionResizes">
+    <bool>false</bool>
+   </attribute>
    <row/>
    <row/>
    <row/>
@@ -44,27 +71,74 @@
    <row/>
    <row/>
    <row/>
-   <column>
-    <property name="text">
-     <string>X</string>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+   <column/>
+  </widget>
+  <widget class="QTabWidget" name="tabTools">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>420</y>
+     <width>641</width>
+     <height>241</height>
+    </rect>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::TabFocus</enum>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <widget class="QWidget" name="tabFilter">
+    <attribute name="title">
+     <string>Filter</string>
+    </attribute>
+   </widget>
+   <widget class="QWidget" name="tabStatistic">
+    <property name="focusPolicy">
+     <enum>Qt::TabFocus</enum>
     </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Y</string>
-    </property>
-   </column>
-   <column>
-    <property name="text">
-     <string>Z</string>
-    </property>
-   </column>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
-   <column/>
+    <attribute name="title">
+     <string>Statistics</string>
+    </attribute>
+    <widget class="QLabel" name="statisticOutput">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>20</y>
+       <width>601</width>
+       <height>111</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>This is the statistical output area.
+Select data to list its statistical properties</string>
+     </property>
+     <property name="alignment">
+      <set>Qt::AlignHCenter|Qt::AlignTop</set>
+     </property>
+    </widget>
+   </widget>
+  </widget>
+  <widget class="QCheckBox" name="checkTool">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>390</y>
+     <width>131</width>
+     <height>17</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>enable Statistic Tools</string>
+   </property>
   </widget>
  </widget>
  <resources/>
