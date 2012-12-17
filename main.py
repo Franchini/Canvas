@@ -36,6 +36,10 @@ class MainWindow (QtGui.QMainWindow, Dlg):
         #check default sqlite db and load the content
         self.__defaultdb = MyConnection(self, "sqlite", database="db/default.db", table="data")
         self.Data = self.__defaultdb.getData()
+        
+        #setup array for TableWindows
+        self.table = []
+        
         #again development only
         print (str(self.Data.getMeasuringPoints()) + " Datapoints loaded")
         
@@ -93,8 +97,8 @@ class MainWindow (QtGui.QMainWindow, Dlg):
         
     def onTableShow(self):
         # pops up a table form for dataview
-        self.datatable = table.TableWindow(self, self.Data)
-        self.datatable.show()
+        self.table.append(table.TableWindow(self, self.Data))
+        self.table[len(self.table) - 1].show()
     
     def onConnect(self):
         # connects to a MySQL db and imports the data into self.data object

@@ -1,6 +1,7 @@
 import sys, os,  math, datetime
 from PyQt4 import QtGui, QtCore
 from ui.Ui_table import Ui_TableWindow as table
+import data as dataObject
 
 class TableWindow (QtGui.QDialog, table):
     def __init__(self, parent, Data=None):
@@ -20,6 +21,8 @@ class TableWindow (QtGui.QDialog, table):
         # set slots
         self.connect(self.checkTool, QtCore.SIGNAL("stateChanged(int)"),  self.__oncheckTool)
         self.connect(self.tableWidget, QtCore.SIGNAL("itemSelectionChanged()"), self.__onSelectionChanged)
+        self.connect(self.buttonApply, QtCore.SIGNAL("clicked()"), self.__onApply)
+        self.connect(self.commandExport, QtCore.SIGNAL("clicked()"), self.__onExport)
         
     def __showData(self, data):
         #includes given data into the QTableWidget
@@ -30,17 +33,26 @@ class TableWindow (QtGui.QDialog, table):
                 self.tableWidget.setItem(i, j, point)
                 
     def __setup(self, DataObject):
-        # will setup the number of rows and columns and name the Window and Columns
+        #  will setup the number of rows and columns
+        #  will name the Window and Columns, and Rows
+        #  will insert Filterfunctions
         self.tableWidget.setRowCount(len(DataObject.getAllData()))
         depths = DataObject.getDepthsValues()
         self.tableWidget.setColumnCount(len(depths))
         self.setWindowTitle(DataObject.getNameStation())
+        self.checkbox = {}
         
-        # set the column header names
+        # set the column header names and create filter checkboxes
         for i, depth in enumerate(depths):
             item = QtGui.QTableWidgetItem()
             item.setText(str(depth))
             self.tableWidget.setHorizontalHeaderItem(i,  item)
+            # checkbox
+            self.checkbox[i] = QtGui.QCheckBox(self)
+            self.checkbox[i].setText(str(depth))
+            self.checkbox[i].setCheckState(2)
+            self.columnSelect.addWidget(self.checkbox[i])
+            # checkbox.setObjectName("check"+str(depth))
             
         # set the row column header names
         start = self.Data.getStartTime()
@@ -54,7 +66,7 @@ class TableWindow (QtGui.QDialog, table):
         for i in range(self.tableWidget.rowCount()):
             item = QtGui.QTableWidgetItem()
             # get time
-            time = start + datetime.timedelta(seconds=(timestep*(i+1)))
+            time = start + datetime.timedelta(seconds=(timestep* i))
             item.setText(str(time.strftime(format)))
             self.tableWidget.setVerticalHeaderItem(i, item)
             
@@ -87,7 +99,50 @@ class TableWindow (QtGui.QDialog, table):
             self.statisticOutput.setText(self.statisticOutput.text() + "Minimum Value:\t\t" + str(self.selection.getMin()) +"\n")
             self.statisticOutput.setText(self.statisticOutput.text() + "Sample Variance:\t\t" + str(self.selection.getVar()) +"\n")
         
+    def __onApply(self):
+        # Apply the Filter either in a new Window or in this Window
+        # in both cases a new data list is created
+        
+        data = []
+        for i in range(self.tableWidget.rowCount()):
+            point = []
+            for j in range(self.tableWidget.columnCount()):
+                if (self.checkbox[j].checkState() == 2):
+                    actual = self.tableWidget.item(i, j)
+                    point.append(float(actual.text()))
+            data.append(point)
+        # create depths
+        temp = self.Data.getDepthsValues()
+        depths = []
+        for j in range(self.tableWidget.columnCount()):
+            if (self.checkbox[j].checkState() == 2):
+                depths.append(temp[j])
+            
+        # create new Data Object
+        export = dataObject.Data(data, depths, self.Data.getLengthTimestep("s"), self.Data.getNameStation(), self.Data.getStartTime())
+        # in case the filter will be applied in same window, it will replace self.Data
+        # otherwise the parent window will create a new TableWindow using export
+        if (self.checkNewWindow.checkState() == 2):
+            #open new Window
+            self.parent.table.append(TableWindow(self.parent, export))
+            self.parent.table[len(self.parent.table) - 1].show()
+        else:
+            self.Data = export
+            for i in self.checkbox:
+                self.checkbox[i].close()
 
+            self.__setup(self.Data)
+            self.__showData(self.Data.getAllData())
+        
+    def __onExport(self):
+        # the self.Data object of TableWindows parent will be replaced by Tablewindow.Data
+        
+        reply = QtGui.QMessageBox.question(self, "Warning",  "This will replace the actual dataset without saving. Are you sure?", 
+            QtGui.QMessageBox.Yes, QtGui.QMessageBox.No)
+        if reply == QtGui.QMessageBox.Yes:
+            self.parent.Data = self.Data
+            self.close()
+        
 class Statistic (object):
     def __init__(self, QTableWidgetItems):
         # create a list of all QTableWidgetItem values
