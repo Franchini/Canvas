@@ -94,12 +94,21 @@ class ImportWindow(QtGui.QDialog, ImDlg):
                         self.importdata.append(data)
                     try:
                         self.dateArray.append(date)
+                        
                     except:
                         #in this case no date data was loaded and exception is ignored
                         pass
             file.close()
             self.depths = self.__createDepths(loadType, self.sensorDepth)
             self.timestep = self.__createTimestep(self.dateArray)
+            try:
+                self.startdate = datetime.strptime(self.dateArray[0], self.dateFormat)
+            except:
+                try:
+                    self.startdate = datetime.strptime(self.dateArray[1], self.dateFormat)
+                except:
+                    self.parent.errorlog.writeError("Could not create Startdate, becahuse dateFormat was invalid")
+                    self.startdate = None
             if self.parent != 0:
                 self.parent.Data = self.exportDataObject()
                 self.parent.logfile.writeLog("ImportWindow created DataObject from file "+self.openfilename+"\n" +
@@ -206,7 +215,7 @@ class ImportWindow(QtGui.QDialog, ImDlg):
             
     def exportDataObject(self):
         #this function will export the imported data as a Data object.
-        exportObject = dataObject.Data(self.importdata, self.depths, self.timestep)
+        exportObject = dataObject.Data(self.importdata, self.depths, self.timestep, "imported station", self.startdate)
         return exportObject
         
     def __createDepths(self, loadType,  sensorDepth):

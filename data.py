@@ -1,5 +1,7 @@
+import datetime
+
 class Data(object):
-    def __init__(self, datatable=None, depths=None,  timestep=0,  stationName="Default Station"):
+    def __init__(self, datatable=None, depths=None,  timestep=0,  stationName="Default Station", startdate=None):
         #check the parameters for given information
         if datatable is not None:
             self.__datatable = datatable
@@ -11,13 +13,20 @@ class Data(object):
         else:
             self.__measuringDepths = []
         
+        if startdate is not None:
+            #startdate has to be a datetime object
+            self.__startdate = startdate
+        else:
+            self.__startdate = datetime.datetime.today()
+        
         self.__timestep = timestep
         self.__name = stationName
         
 #development
         print self.__datatable
         print self.__measuringDepths
-        print self.__timestep 
+        print self.__timestep
+        print self.__startdate
         print self.getMeta()
         
         
@@ -76,18 +85,23 @@ class Data(object):
                 data[i] = dataAtStep[depthIndex]  #writes value of a certain depth during this timestep
         return data
         
+    def getStartTime(self):
+        #returns the starttime as datetime Object
+        return self.__startdate
+        
     def getMeta(self):
         # returns a dictionary of all Metadata, where key is the name of its value; eg: name : default station
         name = self.getNameStation()
         timestep = self.getLengthTimestep("s")
         depths = self.getDepthsValues()
+        start =  self.__startdate.strftime("%Y/%m/%d %H:%M:%S")   # this is a fix value for db connection
         
         #merge depths to one string
         temp = ""
         for depth in depths:
-            temp += str(depth + ",")
+            temp += str(depth)+","
         temp = temp.strip(",")
-        list = {'name':str(name), 'timestep':str(timestep), 'depths':temp}
+        list = {'name':str(name), 'timestep':str(timestep), 'depths':temp, 'start':start}
         
         return list
 

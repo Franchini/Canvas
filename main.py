@@ -256,6 +256,7 @@ class MyConnection(object):
         expdepths = []
         expname = ""
         exptimestep = 0
+        expstartdate = None
         try:
             for point in self.data:
                 # get all values from this datapoint
@@ -274,12 +275,11 @@ class MyConnection(object):
                 elif point[1] == "timestep":
                     exptimestep = int(point[2])
                 elif point[1] == "start":
-                    # THIS MUST BE CONVERTED INTO A DATETIME
-                    expstartdate = point[2]
+                    expstartdate = datetime.datetime.strptime(point[2], "%Y/%m/%d %H:%M:%S")    # this is a fix value for db connection
         except TypeError:
             # self.info was not iterable
             self.parent.errorlog.writeError("Informationtable of %s cannot be read" % self.database)
-        export = dataObject.Data(expdata, expdepths, exptimestep, expname)
+        export = dataObject.Data(expdata, expdepths, exptimestep, expname,  expstartdate)
         return export
     
         

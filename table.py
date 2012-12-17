@@ -1,4 +1,4 @@
-import sys, os,  math
+import sys, os,  math, datetime
 from PyQt4 import QtGui, QtCore
 from ui.Ui_table import Ui_TableWindow as table
 
@@ -36,11 +36,27 @@ class TableWindow (QtGui.QDialog, table):
         self.tableWidget.setColumnCount(len(depths))
         self.setWindowTitle(DataObject.getNameStation())
         
-        # set the header names
+        # set the column header names
         for i, depth in enumerate(depths):
             item = QtGui.QTableWidgetItem()
             item.setText(str(depth))
             self.tableWidget.setHorizontalHeaderItem(i,  item)
+            
+        # set the row column header names
+        start = self.Data.getStartTime()
+        timestep = self.Data.getLengthTimestep("s")
+        format = "%d.%m.%y"
+        if (timestep < (60*60*24)):
+            format = format + " %H:%M"
+            if (timestep < 60):
+                format = format + ":%S"
+        
+        for i in range(self.tableWidget.rowCount()):
+            item = QtGui.QTableWidgetItem()
+            # get time
+            time = start + datetime.timedelta(seconds=(timestep*(i+1)))
+            item.setText(str(time.strftime(format)))
+            self.tableWidget.setVerticalHeaderItem(i, item)
             
     def __oncheckTool(self):
         # check status of checkBox and show or hide tabwidget by setting window size
