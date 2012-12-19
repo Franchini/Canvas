@@ -251,7 +251,7 @@ class ImportWindow(QtGui.QDialog, ImDlg):
         except:
             self.dateFormat = "%y/%m/%d"
         try:
-            self.negativeDepths = self.parent.properties.getValue('negativeDepths')
+            self.negativeDepths = self.parent.properties.getValue('negativedepths')
         except:
             self.negativeDepths = "0"
         

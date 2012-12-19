@@ -64,6 +64,10 @@ class Properties(QtGui.QDialog,  propWindow):
         # All properties have to be written into confg.ini
         pass
         
+    def __writeAllProperties(self):
+        # will write all properties from ConfigParser to the confg.ini file
+        pass
+        
     def onCancel(self):
         # close the PropertiesWindow
         self.close()

@@ -47,15 +47,18 @@ class MainWindow (QtGui.QMainWindow, Dlg):
         self.properties = properties.Properties()
         
         #set slots
-        self.connect(self.buttonShow, QtCore.SIGNAL("clicked()"), self.onShow)
         self.connect(self.actionExit, QtCore.SIGNAL("triggered()"), QtCore.SLOT("close()"))
-        self.connect(self.actionToolbox, QtCore.SIGNAL("triggered()"), self.onToolboxShow)
-        self.connect(self.actionTable, QtCore.SIGNAL("triggered()"), self.onTableShow)
+        self.connect(self.actionTable_2, QtCore.SIGNAL("triggered()"), self.onTableShow)
+        self.connect(self.actionSave, QtCore.SIGNAL("triggered()"), self.onSave)
+        self.connect(self.actionImportFile, QtCore.SIGNAL("triggered()"), self.onImport)
+        self.connect(self.actionImportConnection, QtCore.SIGNAL("triggered()"),  self.onConnect)
+        self.connect(self.actionDatabaseManager, QtCore.SIGNAL("triggered()"), self.onDatabaseManager)
         self.connect(self.buttonMysql, QtCore.SIGNAL("clicked()"), self.onConnect)
         self.connect(self.buttonImport, QtCore.SIGNAL("clicked()"), self.onImport)
         self.connect(self.buttonProperties, QtCore.SIGNAL("clicked()"), self.onProperties)
         self.connect(self.buttonTable, QtCore.SIGNAL("clicked()"), self.onTableShow)
         self.connect(self.buttonExport, QtCore.SIGNAL("clicked()"), self.onExport)
+        self.connect(self.buttonDatabaseManager, QtCore.SIGNAL("clicked()"),  self.onDatabaseManager)
         
         # last command of __init__ method:
         self.logfile.writeLog("Application initialized")
@@ -79,21 +82,13 @@ class MainWindow (QtGui.QMainWindow, Dlg):
             # check if the data should be saved
             event.accept()
         
-    def onShow(self):
-        # self.data is shown in the Canvas as Scatter plot. self.data had to be 
-        # filled by getData method of MyConnection class 
-        try:
-            self.myplot.insertScatter(self.myplot.axes, self.data)
-        except AttributeError, e:
-            print "There was no data imported from database.\n Connect to Database or check the data files"
-        
-      
-    def onToolboxShow(self):
-        # option to hide and show the QDockWidget Toolbox
-        if self.actionToolbox.isChecked():
-            self.Toolbox.show()
-        else:
-            self.Toolbox.hide()
+    def onSave(self):
+        # ask user if the default database should be overwritten
+        reply = QtGui.QMessageBox.question(self,"Message","Do you want to save the current Dataset?",
+            QtGui.QMessageBox.Yes, QtGui.QMessageBox.Cancel)
+        if reply == QtGui.QMessageBox.Yes:
+            self.__defaultdb.write("data", self.Data)
+            self.logfile.writeLog("Dataset %s saved as default database" % self.Data.getNameStation())
         
     def onTableShow(self):
         # pops up a table form for dataview
@@ -140,6 +135,10 @@ class MainWindow (QtGui.QMainWindow, Dlg):
                 except AttributeError:
                     # The connection Data maybe wrong
                     pass
+                    
+    def onDatabaseManager(self):
+        # open Database Manager to import and export to different database conenctions
+       pass 
  
 class MyCanvas (FigureCanvas):
     def __init__(self, parent='None', width=5, height=4, dpi=100):
