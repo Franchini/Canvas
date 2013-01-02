@@ -36,7 +36,7 @@ class Data(object):
         return points
         
     def getAllData(self):
-        # returns all dataobjects as a Array
+        # returns all dataobjects as an Array
         return self.__datatable
         
     def getNameStation(self):
