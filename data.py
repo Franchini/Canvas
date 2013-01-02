@@ -1,4 +1,6 @@
 import datetime
+import numpy as np
+
 
 class Data(object):
     def __init__(self, datatable=None, depths=None,  timestep=0,  stationName="Default Station", startdate=None):
@@ -37,7 +39,8 @@ class Data(object):
         
     def getAllData(self):
         # returns all dataobjects as an Array
-        return self.__datatable
+        allData = np.array(self._datatable)
+        return allData
         
     def getNameStation(self):
         # retuns the Name of the Measurement Site
