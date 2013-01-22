@@ -36,17 +36,20 @@ class Data(object):
         return points
         
     def getAllData(self):
-        # returns all dataobjects as a Array
+        # returns all dataobjects as an Array
         return self.__datatable
         
     def getNameStation(self):
         # retuns the Name of the Measurement Site
         return self.__name
         
-    def getDepthsValues(self):
+    def getDepthsValues(self, mode='s'):
         # retuns an array of all used depths
-        return self.__measuringDepths
-        
+        if mode == 's': return self.__measuringDepths
+        elif mode == 'i': return [(-1)*int(depth) for depth in self.__measuringDepths]
+        elif mode == 'f': return [(-1)*float(depth) for depth in self.__measuringDepths]     
+            
+
     def getLengthTimestep(self,unit="s"):
         #returns the value of self.__timestep using given unit. Accepted values are s (Second), min (Minute), h (Hour), d (day)
         if unit == "s":
