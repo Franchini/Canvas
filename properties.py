@@ -36,7 +36,7 @@ class Properties(QtGui.QDialog,  propWindow):
                 for option in options:
                         self.__properties[option] = self.__config.get(section, option)
                  
-            self.__config.close()
+            #self.__config.close()
         except:
             print "The confg.ini has an invalid format"
             self.close()
@@ -62,11 +62,23 @@ class Properties(QtGui.QDialog,  propWindow):
         
     def onOk(self):
         # All properties have to be written into confg.ini
-        pass
+        self.__writeAllProperties()
         
     def __writeAllProperties(self):
         # will write all properties from ConfigParser to the confg.ini file
-        pass
+        
+        #create section
+        sections = {'csv':{}, 'mysql':{}}
+        # fill options
+        sections['csv'] = {'separationchar':self.separationChar.text(), 'dateformat':self.dateFormat.text()}
+        sections['mysql'] = {'mysqlserver': self.mysqlServer.text(), 'mysqluser':self.mysqlName.text(), 'mysqlpw':self.mysqlPw.text(), 
+            'mysqlbase':self.mysqlBase.text(), 'mysqltable':self.mysqlDatatable.text()}
+        for section in sections:
+            for option in sections[section]:
+                #print sections[section][option]
+                self.__config.set(section, option, sections[section][option])
+        self.__config.write(open("confg.ini", "w"))
+        self.close()
         
     def onCancel(self):
         # close the PropertiesWindow
