@@ -8,17 +8,22 @@ from mpl_toolkits.mplot3d import Axes3D
 import table, filestream,  importdata, properties
 import data as dataObject
 
+from matplotlib import cm
+from matplotlib.ticker import LinearLocator, FormatStrFormatter
+import matplotlib.pyplot as plt
+import numpy as np
+
+
 
 class MainWindow (QtGui.QMainWindow, Dlg):
     def __init__(self):
         QtGui.QMainWindow.__init__(self)
         self.setupUi(self)
         self.main_widget = QtGui.QWidget(self)
-        self.myplot = MyCanvas(self.main_widget)
+        
         
         self.layout = QtGui.QVBoxLayout(self.main_widget)
-        self.layout.addWidget(self.myplot)
-        #self.setLayout(self.layout)
+
         
         self.main_widget.setFocus()
         self.setCentralWidget(self.main_widget)
@@ -60,6 +65,11 @@ class MainWindow (QtGui.QMainWindow, Dlg):
         self.connect(self.buttonExport, QtCore.SIGNAL("clicked()"), self.onExport)
         self.connect(self.buttonDatabaseManager, QtCore.SIGNAL("clicked()"),  self.onDatabaseManager)
         
+        self.myplot = MyCanvas(self, self.main_widget)
+        self.layout.addWidget(self.myplot)
+        #self.setLayout(self.layout)
+
+
         # last command of __init__ method:
         self.logfile.writeLog("Application initialized")
         
@@ -141,25 +151,43 @@ class MainWindow (QtGui.QMainWindow, Dlg):
        pass 
  
 class MyCanvas (FigureCanvas):
-    def __init__(self, parent='None', width=5, height=4, dpi=100):
-        fig = Figure()
-        self.axes = fig.add_subplot(111, projection='3d')
-        FigureCanvas.__init__(self, fig)
+    def __init__(self, parent, widget, width=5, height=4, dpi=100):
+        self.figure = plt.figure()
+        self.axes = self.figure.add_subplot(111, projection='3d')
+        FigureCanvas.__init__(self, self.figure)
         #SizePolicy
         FigureCanvas.setSizePolicy(self,QtGui.QSizePolicy.Expanding,
             QtGui.QSizePolicy.Expanding)
         FigureCanvas.updateGeometry(self)
-        self.setParent(parent)
+        self.setParent(widget)
+        self.parent = parent
         self.axes.mouse_init()
 
-    def insertScatter(self, axes, data):
-        i = 0
-        length = len(data)
         
-        while i < length:
-            axes.scatter(data[i][1], data[i][2], data[i][3], c='b')
-            i += 1
-        self.draw()
+        if parent is not None:
+            self.drawData(data = self.parent.Data.getAllData(), depths = self.parent.Data.getDepthsValues(mode='i'), timesteps = self.parent.Data.getNumberTimesteps(), starttime = self.parent.Data.getStartTime())
+    
+        
+        
+    
+    def drawData(self, data, depths, timesteps, starttime):
+        print 'drawData'
+        print 'depths = ', depths, ', starttime = ', starttime, 'timesteps = ', timesteps
+        timeline =  range(timesteps)
+        #produces vector of the length of timesteps that works together with depths as a grid for plotting the data
+        timeline, depths = np.meshgrid(timeline, depths)
+        #produces the grid
+        data = zip(*data)
+        #transposes the datamatrix
+        dataarray = np.array(data)
+        self.axes.plot_surface(timeline,depths, dataarray, rstride=1, cstride=1, cmap=cm.jet, linewidth=0, antialiased=True)
+        #plots the data
+        self.figure.colorbar( self.axes.plot_surface(timeline,depths, dataarray, rstride=1, cstride=1, cmap=cm.jet, linewidth=1, antialiased=True))
+        #adds a color-scale to the plot
+        print 'drawData'
+        print 'depths = ', depths, ', timeline = ', timeline
+        print 'Data: ', dataarray
+
 
 
 class MyConnection(object):
